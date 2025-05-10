@@ -14,9 +14,10 @@ from urls import BASE_URL, SIGN_IN_URL, SCHEDULE_URL, APPOINTMENTS_URL
 
 
 def log_in(driver):
+    if driver.current_url != SIGN_IN_URL:
+        return
 
     print('Logging in.')
-    print(f"Using credentials: {username=} {password=}") 
 
     # Fill in email
     user_box = driver.find_element(By.NAME, 'user[email]')
@@ -40,13 +41,7 @@ def log_in(driver):
     # Wait for redirect to complete
     time.sleep(3)
 
-    # Save screenshot of what the browser sees now
-    driver.save_screenshot("post_login.png")
-
-    if "sign_in" in driver.current_url:
-        print("❌ Login failed. Still on sign-in page.")
-    else:
-        print("✅ Login successful.")
+    print('Login submitted.')
 
 
 def is_worth_notifying(year, month, days):
