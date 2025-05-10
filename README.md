@@ -1,8 +1,17 @@
-# 2025 Version of US Visa appointment finder 😎
+#  🇨🇦 2025 US Visa Appointment Finder (Canada Edition) 😎
 
-😎 Parser of US visa appointment slots on [ais.usvisa-info.com](www.ais.usvisa-info.com)
+This script checks for available **US visa appointment slots** on [ais.usvisa-info.com](https://ais.usvisa-info.com) and notifies you via Telegram if any slots meet your criteria.
 
-Script will notify you via telegram if any slots available under your conditions.
+---
+
+## 🚀 Features
+
+- Parses appointment availability for **all Canadian consular cities**
+- Sends instant alerts via **Telegram**
+- Supports **multiple locations** (e.g., Vancouver, Calgary, Montreal, etc.)
+- Configurable polling interval and date filter
+
+---
 
 ## Installation
 
@@ -28,7 +37,7 @@ password=qwerty
 url_id=12345678
 country_code=ca
 facility_name=Vancouver
-latest_notification_date=2025-05-01
+latest_notification_date=2026-05-01
 seconds_between_checks=180
 telegram_bot_token=12345:some_token
 telegram_chat_id=12345

@@ -10,15 +10,15 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 
-from creds import username, password, facility_name, latest_notification_date, seconds_between_checks
+from creds import username, password, facility_names, latest_notification_date, seconds_between_checks
 from telegram import send_message, send_photo
 from urls import BASE_URL, SIGN_IN_URL, SCHEDULE_URL, APPOINTMENTS_URL
 
 
 def log_in(driver):
     print('Logging in.')
-    print(f"Using credentials: {username=} {password=}") 
-    print(f"Current URL: {driver.current_url}") 
+    print(f"Using credentials: {username=} {password=}")
+    print(f"Current URL: {driver.current_url}")
 
     # Wait for email field to be present
     WebDriverWait(driver, 10).until(
@@ -56,8 +56,10 @@ def log_in(driver):
 
 
 def is_worth_notifying(year, month, days):
-    first_available_date_object = datetime.datetime.strptime(f'{year}-{month}-{days[0]}', "%Y-%B-%d")
-    latest_notification_date_object = datetime.datetime.strptime(latest_notification_date, '%Y-%m-%d')
+    first_available_date_object = datetime.datetime.strptime(
+        f'{year}-{month}-{days[0]}', "%Y-%B-%d")
+    latest_notification_date_object = datetime.datetime.strptime(
+        latest_notification_date, '%Y-%m-%d')
     return first_available_date_object <= latest_notification_date_object
 
 
@@ -84,9 +86,41 @@ def check_appointments(driver):
         print("No 'Continue' button found — possibly not needed.")
 
     try:
-        facility_select = Select(driver.find_element(By.ID, 'appointments_consulate_appointment_facility_id'))
-        facility_select.select_by_visible_text(facility_name)
-        time.sleep(1)
+        facility_select = Select(driver.find_element(
+          By.ID, 'appointments_consulate_appointment_facility_id'))
+
+        for city in facility_names:
+            print(f"🔍 Checking appointments for {city}...")
+            facility_select.select_by_visible_text(city)
+            time.sleep(1)
+
+            if driver.find_element(By.ID, 'consulate_date_time_not_available').is_displayed():
+                print(f"No dates available for {city}")
+                continue
+
+            # Open the calendar
+            driver.find_element(
+                By.ID, 'appointments_consulate_appointment_date').click()
+
+            for date_picker in driver.find_elements(By.CLASS_NAME, 'ui-datepicker-group'):
+                day_elements = date_picker.find_elements(By.TAG_NAME, 'td')
+                available_days = [day_element.find_element(By.TAG_NAME, 'a').get_attribute("textContent")
+                                for day_element in day_elements if day_element.get_attribute("class") == ' undefined']
+                if available_days:
+                    month = date_picker.find_element(
+                        By.CLASS_NAME, 'ui-datepicker-month').get_attribute("textContent")
+                    year = date_picker.find_element(
+                        By.CLASS_NAME, 'ui-datepicker-year').get_attribute("textContent")
+                    message = f'📅 Available days in {city} - {month} {year}: {", ".join(available_days)}\nLink: {SIGN_IN_URL}'
+                    print(message)
+
+                    if not is_worth_notifying(year, month, available_days):
+                        print("Not worth notifying.")
+                        continue
+
+                    send_message(message)
+                    send_photo(driver.get_screenshot_as_png())
+                    return  # exit after first hit
 
         # Check for system busy message
         if "System is busy" in driver.page_source:

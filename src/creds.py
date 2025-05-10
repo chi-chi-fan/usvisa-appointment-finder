@@ -15,7 +15,9 @@ url_id = configs.get('url_id').data
 # Country code in the url
 country_code = configs.get('country_code').data
 
-facility_name = configs.get('facility_name').data
+# Loop all the available cities
+facility_names = configs.get('facility_names').data.split(",")
+facility_names = [f.strip() for f in facility_names]
 
 latest_notification_date = configs.get('latest_notification_date').data
 
