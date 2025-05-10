@@ -1,3 +1,5 @@
 config/app-config.properties
 .DS_Store
 .src/tempCodeRUnnerFile.py
+post_login.png
+system_busy.png
