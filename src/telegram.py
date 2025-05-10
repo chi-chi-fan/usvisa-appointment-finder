@@ -2,6 +2,8 @@ import requests
 from creds import telegram_bot_token, telegram_chat_id
 
 
+
+
 def send_message(text):
     url = f'https://api.telegram.org/bot{telegram_bot_token}/sendMessage'
     parameters = {
@@ -17,3 +19,7 @@ def send_photo(photo_file):
         'chat_id': telegram_chat_id
     }
     return requests.post(url, parameters, files={'photo': photo_file})
+
+# Test the message function
+if __name__ == "__main__":
+    send_message("✅ Test message from your visa checker bot!")
